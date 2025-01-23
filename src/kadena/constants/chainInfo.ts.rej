@@ -1,0 +1,10 @@
+diff a/web/src/constants/chainInfo.ts b/web/src/constants/chainInfo.ts	(rejected hunks)
+@@ -69,7 +69,7 @@ export const CHAIN_INFO: ChainInfoMap = {
+     displayName: "Devnet",
+     logoUrl: kadenaLogoUrl.src,
+     nativeCurrency: { name: "Kadena Coin", symbol: "KDA", decimals: 12 },
+-    nodeUrl: `https://devnet.ecko.finance/chainweb/0.0/${SupportedKadenaNetworkId.DEVNET}/chain/${KADENA_CHAIN_ID}/pact`,
++    nodeUrl: `https://172.20.26.141:8080/chainweb/0.0/${SupportedKadenaNetworkId.DEVNET}/chain/${KADENA_CHAIN_ID}/pact`,
+     primaryColor: "#F01B36",
+   },
+   [SupportedKadenaNetworkId.MAINNET]: {
