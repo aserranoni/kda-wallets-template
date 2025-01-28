@@ -2,7 +2,7 @@ import {
   checkVerifiedAccount,
   PactCommandToSign,
   PactSignedTx,
-} from '../../utils/kadenaHelper';
+} from '@/utils/kadenaHelper';
 import { BaseChainInfo, KADENA_CHAIN_ID } from '../constants/chainInfo';
 import { Actions, Connector, Provider } from '../types';
 import detectKadenaProvider from './provider';
