@@ -202,7 +202,7 @@ export const createSignCmd = (
     chainId: KADENA_CHAIN_ID,
     ttl: 28800,
     envData,
-    signingPubKey: account.guard.keys[0],
+    signingPubKey: '',
     networkId,
     nonce: nonce ?? new Date().toUTCString(),
   };

@@ -7,6 +7,7 @@ import ZELCORE_ICON_URL from '@/assets/zelcore.svg?url';
 import {
   chainweaver,
   eckoWallet,
+  spireKey,
   walletConnect,
   WalletEnum,
   zelcore,
@@ -55,6 +56,14 @@ export const KADENA_SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     name: 'WalletConnect',
     iconURL: WALLETCONNECT_ICON_URL.src,
     description: 'WalletConnect',
+    href: null,
+    color: '#3B99FC',
+  },
+  [WalletEnum.SPIRE_KEY]: {
+    connector: spireKey,
+    name: 'SpireKey',
+    iconURL: WALLETCONNECT_ICON_URL.src,
+    description: 'SpireKey',
     href: null,
     color: '#3B99FC',
   },

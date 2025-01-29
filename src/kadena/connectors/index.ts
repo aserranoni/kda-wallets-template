@@ -1,16 +1,18 @@
+import { Chainweaver } from '@/kadena/chainweaver';
+import { initializeConnector, KadenaReactHooks } from '@/kadena/core';
+import { EckoWallet } from '@/kadena/ecko-wallet';
+import { SpireKeyConnector } from '@/kadena/spirekey';
+import { Connector } from '@/kadena/types';
+import { WalletConnect } from '@/kadena/walletconnect';
+import { Zelcore } from '@/kadena/zelcore';
 import { useMemo } from 'react';
-import { Chainweaver } from '../chainweaver';
-import { initializeConnector, KadenaReactHooks } from '../core';
-import { EckoWallet } from '../ecko-wallet';
-import { Connector } from '../types';
-import { WalletConnect } from '../walletconnect'; // Import WalletConnect
-import { Zelcore } from '../zelcore';
 
 export enum WalletEnum {
   ECKO_WALLET = 'ECKO_WALLET',
   ZELCORE = 'ZELCORE',
   CHAINWEAVER = 'CHAINWEAVER',
-  WALLET_CONNECT = 'WALLET_CONNECT', // Add WalletConnect enum
+  WALLET_CONNECT = 'WALLET_CONNECT',
+  SPIRE_KEY = 'SPIRE_KEY',
 }
 
 export const BACKFILLABLE_KADENA_WALLETS = [
@@ -18,7 +20,9 @@ export const BACKFILLABLE_KADENA_WALLETS = [
   WalletEnum.ZELCORE,
   WalletEnum.CHAINWEAVER,
   WalletEnum.WALLET_CONNECT,
+  WalletEnum.SPIRE_KEY,
 ];
+
 export const SELECTABLE_KADENA_WALLETS = [...BACKFILLABLE_KADENA_WALLETS];
 
 function onError(error: Error) {
@@ -34,6 +38,9 @@ export const [zelcore, zelcoreHooks] = initializeConnector<Zelcore>(
 export const [chainweaver, chainweaverHooks] = initializeConnector<Chainweaver>(
   (actions) => new Chainweaver({ actions, onError }),
 );
+export const [spireKey, spireKeyHooks] = initializeConnector<SpireKeyConnector>(
+  (actions) => new SpireKeyConnector({ actions, onError }),
+);
 export const [walletConnect, walletConnectHooks] =
   initializeConnector<WalletConnect>(
     (actions) =>
@@ -41,7 +48,7 @@ export const [walletConnect, walletConnectHooks] =
         actions,
         onError,
       }),
-  ); // Initialize WalletConnect
+  );
 
 export function getKadenaWalletForConnector(connector: Connector) {
   switch (connector) {
@@ -53,6 +60,8 @@ export function getKadenaWalletForConnector(connector: Connector) {
       return WalletEnum.CHAINWEAVER;
     case walletConnect:
       return WalletEnum.WALLET_CONNECT;
+    case spireKey:
+      return WalletEnum.SPIRE_KEY;
     default:
       throw Error('unsupported connector');
   }
@@ -68,6 +77,8 @@ export function getConnectorForKadenaWallet(wallet: WalletEnum) {
       return chainweaver;
     case WalletEnum.WALLET_CONNECT:
       return walletConnect;
+    case WalletEnum.SPIRE_KEY:
+      return spireKey;
     default:
       throw Error('unsupported connector');
   }
@@ -83,6 +94,8 @@ function getHooksForKadenaWallet(wallet: WalletEnum) {
       return chainweaverHooks;
     case WalletEnum.WALLET_CONNECT:
       return walletConnectHooks;
+    case WalletEnum.SPIRE_KEY:
+      return spireKeyHooks;
   }
 }
 
