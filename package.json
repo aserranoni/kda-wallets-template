@@ -20,8 +20,9 @@
     "test:ci": "jest --ci"
   },
   "dependencies": {
-    "@kadena/client": "^1.5.0",
+    "@kadena/client": "^1.16.0",
     "@kadena/spirekey-sdk": "^1.0.0",
+    "@kadena/types": "^0.7.0",
     "@reduxjs/toolkit": "^2.5.0",
     "@tailwindcss/typography": "^0.5.16",
     "@walletconnect/modal": "^2.7.0",

@@ -1,10 +1,10 @@
 import {
   checkVerifiedAccount,
-  PactCommandToSign,
-  PactSignedTx,
+  formatCommandForWallets,
 } from '@/utils/kadenaHelper';
+import { IPactCommand } from '@kadena/client';
 import { BaseChainInfo, KADENA_CHAIN_ID } from '../constants/chainInfo';
-import { Actions, Connector, Provider } from '../types';
+import { Actions, Connector, KadenaWalletResponse, Provider } from '../types';
 import detectKadenaProvider from './provider';
 
 type ChainweaverProvider = Provider & {
@@ -61,8 +61,9 @@ export class Chainweaver extends Connector {
     }));
   }
 
-  public async signTx(command: PactCommandToSign): Promise<PactSignedTx> {
-    const cmdToSign = { ...command, data: command.envData };
+  public async signTx(command: IPactCommand): Promise<KadenaWalletResponse> {
+    const cmd = formatCommandForWallets(command);
+    const cmdToSign = { ...cmd, data: cmd.envData };
     const response = await fetch('http://127.0.0.1:9467/v1/sign', {
       headers: {
         'Content-Type': 'application/json',

@@ -2,11 +2,16 @@ import {
   KADENA_CHAIN_ID,
   KADENA_NETWORK_ID,
 } from '@/kadena/constants/chainInfo';
-import { Actions, Connector, KadenaAccount, Provider } from '@/kadena/types';
-import { PactCommandToSign, PactSignedTx } from '@/utils/kadenaHelper';
-import { Pact } from '@kadena/client';
+import {
+  Actions,
+  Connector,
+  KadenaAccount,
+  KadenaWalletResponse,
+  Provider,
+} from '@/kadena/types';
+import { toUnsignedCommand } from '@/utils/kadenaHelper';
+import type { IPactCommand } from '@kadena/client';
 import { connect, initSpireKey, sign } from '@kadena/spirekey-sdk';
-import { IUnsignedCommand, PactCode } from '@kadena/types';
 
 class NoSpireKeyError extends Error {
   constructor() {
@@ -49,6 +54,7 @@ export class SpireKeyConnector extends Connector {
       balance: Number(account.balance),
       chainId: account.chainIds[0], // Assuming `chainIds` is an array
       publicKey: account.devices[0].guard.keys[0],
+      scheme: 'WebAuthn',
     };
     console.log(account);
     if (!account) {
@@ -60,51 +66,12 @@ export class SpireKeyConnector extends Connector {
     this.actions.resetState();
   }
 
-  private toUnsignedCommand(cmd: PactCommandToSign): {
-    command: IUnsignedCommand | undefined;
-  } {
-    if (this.KdaAccount) {
-      const builder = Pact.builder
-        .execution(cmd.code as PactCode)
-        .setMeta({
-          gasLimit: cmd.gasLimit,
-          gasPrice: cmd.gasPrice,
-          senderAccount: this.KdaAccount.account,
-          chainId: KADENA_CHAIN_ID,
-          ttl: cmd.ttl,
-        })
-        .setNetworkId(KADENA_NETWORK_ID)
-        .setNonce(cmd.nonce || new Date().toISOString())
-        .addSigner(
-          {
-            pubKey: this.KdaAccount.publicKey ?? '',
-            scheme: 'WebAuthn',
-          },
-          (withCap) => cmd.caps.map((e) => withCap(e.cap.name, ...e.cap.args)),
-        );
+  public async signTx(command: IPactCommand): Promise<KadenaWalletResponse> {
+    const cmd = toUnsignedCommand(command);
 
-      console.log(JSON.stringify(builder));
-
-      // Add any environment data if present
-      if (cmd.envData) {
-        Object.keys(cmd.envData).forEach((key) => {
-          if (cmd.envData) builder.addData(key, cmd.envData[key]);
-        });
-      }
-
-      const unsignedCommand: IUnsignedCommand = builder.createTransaction();
-
-      return { command: unsignedCommand };
-    }
-
-    return { command: undefined };
-  }
-
-  public async signTx(command: PactCommandToSign): Promise<PactSignedTx> {
-    const cmd = this.toUnsignedCommand(command);
     try {
       const { transactions, isReady } = await sign(
-        [cmd.command as IUnsignedCommand],
+        [cmd],
         [
           {
             accountName: this.account.accountName,
@@ -113,19 +80,19 @@ export class SpireKeyConnector extends Connector {
           },
         ],
       );
-      console.log(transactions[0]);
       if (await isReady())
         return {
           status: 'success',
           errors: null,
+          // TODO: This can be done in a better way for when there are multiple txs
           signedCmd: transactions[0],
-        } as PactSignedTx;
+        } as ICommand;
       else
         return {
           status: 'failure',
           errors: 'some error occurred',
           signedCmd: null,
-        } as PactSignedTx;
+        } as ICommand;
     } catch (err) {
       return {
         status: 'failure',

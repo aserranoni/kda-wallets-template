@@ -3,14 +3,14 @@ import {
   KADENA_CHAIN_ID,
   KADENA_NETWORK_ID,
 } from '@/kadena/constants/chainInfo';
+import { IPactCommand } from '@kadena/client';
 import { WalletConnectModal } from '@walletconnect/modal';
 import Client from '@walletconnect/sign-client';
 import { SessionTypes } from '@walletconnect/types';
 import { getSdkError } from '@walletconnect/utils';
 import {
   checkVerifiedAccount,
-  PactCommandToSign,
-  PactSignedTx,
+  formatCommandForWallets,
 } from '../../utils/kadenaHelper';
 import { Actions, Connector, KadenaAccount, Provider } from '../types';
 
@@ -221,7 +221,8 @@ export class WalletConnect extends Connector {
     }
   }
 
-  public async signTx(command: PactCommandToSign): Promise<PactSignedTx> {
+  public async signTx(command: IPactCommand): Promise<KadenaWalletResponse> {
+    const cmd = formatCommandForWallets(command);
     if (!this.client) {
       throw new Error('WalletConnect client is not initialized');
     }
@@ -231,7 +232,7 @@ export class WalletConnect extends Connector {
 
     const request = {
       method: 'kadena_sign_v1',
-      params: command,
+      params: cmd,
     };
 
     try {

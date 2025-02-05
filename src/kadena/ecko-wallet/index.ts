@@ -1,10 +1,10 @@
 import {
   checkVerifiedAccount,
-  PactCommandToSign,
-  PactSignedTx,
+  formatCommandForWallets,
 } from '@/utils/kadenaHelper';
+import { IPactCommand } from '@kadena/client';
 import { KADENA_NETWORK_ID } from '../constants/chainInfo';
-import { Actions, Connector, Provider } from '../types';
+import { Actions, Connector, KadenaWalletResponse, Provider } from '../types';
 import detectKadenaProvider from './provider';
 
 type EckoWalletProvider = Provider & {
@@ -138,12 +138,13 @@ export class EckoWallet extends Connector {
     }>;
   }
 
-  public async signTx(command: PactCommandToSign): Promise<PactSignedTx> {
+  public async signTx(command: IPactCommand): Promise<KadenaWalletResponse> {
+    const cmd = formatCommandForWallets(command);
     const response = (await this.provider?.request({
       method: 'kda_requestSign',
       data: {
-        networkId: command.networkId,
-        signingCmd: { ...command, raw: false },
+        networkId: KADENA_NETWORK_ID,
+        signingCmd: { ...cmd, raw: true },
       },
     })) as {
       status: string;
@@ -154,6 +155,7 @@ export class EckoWallet extends Connector {
         sigs: [{ sig: string }];
       };
     };
+    console.log(response);
 
     return {
       status: response.status,

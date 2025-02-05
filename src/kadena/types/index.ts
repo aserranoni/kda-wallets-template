@@ -1,6 +1,6 @@
+import { ICommand } from '@kadena/types';
 import type { EventEmitter } from 'node:events';
 import type { StoreApi } from 'zustand';
-import { PactCommandToSign, PactSignedTx } from '../../utils/kadenaHelper';
 
 export type Network = {
   name: string;
@@ -22,6 +22,7 @@ export type AccountDetails = {
 export type KadenaAccount = {
   account: string;
   publicKey?: string | undefined;
+  scheme?: string | undefined;
   balance: number;
   chainId: string;
 };
@@ -31,6 +32,12 @@ export interface KadenaReactState {
   account: KadenaAccount | undefined;
   activating: boolean;
   sharedAccounts: string[] | undefined;
+}
+
+export interface KadenaWalletResponse {
+  status: string;
+  signedCmd: ICommand | null;
+  errors: string | null;
 }
 
 export type KadenaReactStore = StoreApi<KadenaReactState>;
@@ -141,5 +148,5 @@ export abstract class Connector {
 
   public onSelectAccount?(account: string): Promise<void> | void;
 
-  public abstract signTx(command: PactCommandToSign): Promise<PactSignedTx>;
+  public abstract signTx(command: IPactCommand): Promise<KadenaWalletResponse>;
 }
