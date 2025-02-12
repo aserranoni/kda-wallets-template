@@ -29,10 +29,9 @@ const Home: React.FC = (): JSX.Element => {
 
     setWriteInProgress(true);
     try {
-      console.log(account);
       if (account) {
         await writeMessage({
-          account: account?.account,
+          account: account,
           messageToWrite,
           connector,
         });

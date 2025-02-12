@@ -12,12 +12,11 @@ export default async function writeMessage({
   messageToWrite,
   connector,
 }): Promise<ICommandResult> {
-  if (account) {
+  if (account?.account) {
     try {
       const { data } = await checkVerifiedAccount(account);
 
       const client = createClient(CHAIN_INFO[KADENA_NETWORK_ID].nodeUrl);
-
       const command = Pact.builder
         .execution(
           // @ts-ignore

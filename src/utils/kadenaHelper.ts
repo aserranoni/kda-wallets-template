@@ -108,7 +108,7 @@ export const toUnsignedCommand = function (input: any): any {
   return unsignedCommand;
 };
 
-// NOTE: For ecko and Zelcore
+// NOTE: For Ecko and Zelcore and Chainweaver
 export const formatCommandForWallets = function (input: any): any {
   return {
     code: input.payload.exec.code,
